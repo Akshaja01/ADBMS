@@ -1,0 +1,67 @@
+create table hotel1(hotelid int, name varchar(20),no_of_rooms int,rate int,constraint h3 primary key(hotelid));
+
+create table guest11(gid int, gname varchar(20),no_of_rooms int ,hid int ,constraint g6 primary key(gid),constraint h6 foreign key
+(hid) references hotel1(hotelid));
+
+
+insert into hotel1 values(1,'A',4,500);
+insert into hotel1 values(2,'B',3,1500);
+insert into hotel1 values(3,'C',2,1500);
+insert into hotel1 values(4,'D',1,400);
+
+insert into guest11 values(100,'anu',1,1);
+insert into guest11 values(101,'manu',1,3);
+insert into guest11 values(102,'gopu',1,4);
+insert into guest11 values(103,'devu',1,1);
+
+--------------------PL/SQL QUERY-----------------------------------
+
+a)To find the room rent paid by each guest
+
+set serveroutput on;
+DECLARE
+  r NUMBER(10);
+  CURSOR c IS
+    SELECT guest11.*, hotel1.rate
+    FROM guest11, hotel1
+    WHERE guest11.hid = hotel1.hotelid;
+  id guest11.gid%TYPE;
+  name guest11.gname%TYPE;
+  rooms guest11.no_of_rooms%TYPE;
+  hid guest11.hid%TYPE;
+  rate hotel1.rate%TYPE;
+BEGIN
+  OPEN c;
+  DBMS_OUTPUT.PUT_LINE('id ' || 'name ' || 'hid ' || 'rate');
+  LOOP
+    FETCH c INTO id, name, rooms, hid, rate;
+    EXIT WHEN c%NOTFOUND;
+    r := 0;
+    r := rate * rooms;
+    DBMS_OUTPUT.PUT_LINE(id || ' ' || name || ' ' || hid || ' ' || rate);
+  END LOOP;
+  CLOSE c;
+END;
+/
+
+---------------------------------------------------------
+b)Display all hotel details having rate/day > 500
+
+DECLARE
+  CURSOR c IS
+    SELECT *FROM hotel1 WHERE rate > 500;
+  hid hotel1.hotelid%TYPE;
+  name hotel1.name%TYPE;
+  tr hotel1.no_of_rooms%TYPE;
+  rate hotel1.rate%TYPE;
+BEGIN
+  OPEN c;
+  DBMS_OUTPUT.PUT_LINE('hid ' || 'name ' || 'rooms ' || 'rate');
+  LOOP
+    FETCH c INTO hid, name, tr, rate;
+    EXIT WHEN c%NOTFOUND;
+    DBMS_OUTPUT.PUT_LINE(hid || ' ' || name || ' ' || tr || ' ' || rate);
+  END LOOP;
+  CLOSE c;
+END;
+/
